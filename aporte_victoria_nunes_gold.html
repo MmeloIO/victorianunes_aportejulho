@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ordem de Aporte — Victoria Nunes</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400&display=swap');
+
+:root{
+  --navy:#1E2761;
+  --gold:#C9A84C;
+  --gold-light:#E8CE85;
+  --bg:#0A0C1A;
+  --bg-surface:#11142A;
+  --bg-elevated:#161A36;
+  --border:#232A52;
+  --text-primary:#F2F1EC;
+  --text-secondary:#B9BAD1;
+  --text-muted:#5D6389;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background:var(--bg);
+  color:var(--text-secondary);
+  font-family:'DM Sans', sans-serif;
+  font-weight:400;
+  display:flex;
+  justify-content:center;
+  padding:32px 16px;
+  min-height:100vh;
+}
+
+.doc {
+  max-width:640px;
+  width:100%;
+  background:var(--bg);
+  border:0.5px solid var(--border);
+  border-radius:14px;
+  overflow:hidden;
+  position:relative;
+}
+
+/* ---------- LOCK SCREEN ---------- */
+#lock {
+  position:fixed; inset:0; background:var(--bg);
+  display:flex; align-items:center; justify-content:center;
+  z-index:100; padding:24px;
+}
+.lock-card {
+  max-width:340px; width:100%; text-align:center;
+  border:0.5px solid var(--border); border-radius:14px;
+  background:var(--bg-surface); padding:40px 32px;
+}
+.lock-brand {
+  display:inline-flex; align-items:center; gap:6px;
+  font-size:11px; font-weight:500; letter-spacing:0.1em;
+  text-transform:uppercase; color:var(--gold);
+  border:0.5px solid rgba(201,168,76,0.3); padding:5px 12px;
+  border-radius:20px; background:rgba(201,168,76,0.06);
+  margin-bottom:22px;
+}
+.lock-title {
+  font-family:'Playfair Display', serif; font-size:22px; color:var(--text-primary);
+  margin-bottom:8px; font-weight:600;
+}
+.lock-sub { font-size:12.5px; color:var(--text-muted); margin-bottom:24px; line-height:1.6; }
+.lock-input {
+  width:100%; background:var(--bg-elevated); border:0.5px solid var(--border);
+  border-radius:8px; padding:12px 14px; color:var(--text-primary);
+  font-family:'DM Mono', monospace; font-size:14px; margin-bottom:14px;
+  outline:none;
+}
+.lock-input:focus { border-color:var(--gold); }
+.lock-btn {
+  width:100%; background:linear-gradient(135deg, var(--gold), #A98A38);
+  border:none; border-radius:8px; padding:12px; color:#1A1206;
+  font-weight:600; font-size:13px; letter-spacing:0.02em; cursor:pointer;
+  font-family:'DM Sans', sans-serif;
+}
+.lock-error { font-size:12px; color:#E36767; margin-top:12px; display:none; }
+
+/* ---------- CONTENT ---------- */
+#content { display:none; }
+
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(18px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+.cover {
+  background:linear-gradient(180deg, var(--navy) 0%, var(--bg) 100%);
+  border-bottom:1px solid var(--border);
+  padding:44px 40px 36px;
+  position:relative; overflow:hidden;
+  animation:fadeUp .65s ease both;
+}
+.cover::before {
+  content:'';
+  position:absolute; top:-90px; right:-90px;
+  width:300px; height:300px; border-radius:50%;
+  background:radial-gradient(circle, rgba(201,168,76,0.14) 0%, transparent 70%);
+}
+.brand-tag {
+  display:inline-flex; align-items:center; gap:6px;
+  font-size:11px; font-weight:500; letter-spacing:0.08em;
+  text-transform:uppercase; color:var(--gold);
+  border:0.5px solid rgba(201,168,76,0.3); padding:5px 12px;
+  border-radius:20px; background:rgba(201,168,76,0.07);
+  margin-bottom:26px; position:relative; z-index:1;
+}
+.brand-dot { width:6px; height:6px; border-radius:50%; background:var(--gold); }
+.cover-name {
+  font-family:'Playfair Display', serif;
+  font-size:32px; font-weight:600; color:var(--text-primary);
+  margin:0 0 6px; line-height:1.15; position:relative; z-index:1;
+}
+.cover-date {
+  font-size:13px; color:var(--text-muted); margin-bottom:20px; position:relative; z-index:1;
+}
+.cover-quote {
+  font-family:'Playfair Display', serif; font-style:italic;
+  font-size:16px; color:var(--gold-light); line-height:1.55;
+  border-left:2px solid var(--gold); padding-left:18px;
+  margin:0; position:relative; z-index:1;
+}
+
+.section { padding:32px 40px; border-bottom:1px solid var(--border); animation:fadeUp .55s ease both; }
+.section-label {
+  font-size:10px; font-weight:500; letter-spacing:0.12em;
+  text-transform:uppercase; color:var(--gold);
+  display:flex; align-items:center; gap:10px; margin-bottom:18px;
+}
+.section-label::after { content:''; flex:1; height:0.5px; background:var(--border); }
+.section-title {
+  font-family:'Playfair Display', serif; font-size:20px;
+  color:var(--text-primary); margin:0 0 6px; font-weight:600;
+}
+.section-subtitle { font-size:13px; color:var(--text-muted); margin:0 0 22px; line-height:1.6; }
+
+.metrics-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+.metric-card { background:var(--bg-surface); border:0.5px solid var(--border); border-radius:10px; padding:14px 12px; }
+.metric-label { font-size:10px; color:var(--gold); font-weight:500; letter-spacing:0.03em; margin:0 0 8px; text-transform:uppercase; }
+.metric-value { font-family:'DM Mono', monospace; font-size:17px; font-weight:400; color:var(--text-primary); margin:0 0 4px; line-height:1.15; }
+.metric-delta { font-size:11px; margin:0; color:var(--text-muted); }
+
+.asset-card {
+  background:var(--bg-surface); border:0.5px solid var(--border); border-radius:10px;
+  padding:20px; margin-bottom:14px;
+}
+.asset-head { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px; gap:12px; }
+.asset-name { font-size:15px; font-weight:500; color:var(--text-primary); margin:0 0 2px; }
+.asset-ticker { font-family:'DM Mono', monospace; font-size:11px; color:var(--gold); letter-spacing:0.03em; }
+.asset-amount { font-family:'DM Mono', monospace; font-size:16px; color:var(--text-primary); text-align:right; white-space:nowrap; }
+.asset-tag {
+  display:inline-block; font-size:10px; font-weight:500; letter-spacing:0.04em;
+  text-transform:uppercase; padding:3px 9px; border-radius:20px; margin-bottom:12px;
+}
+.asset-tag.rf   { background:rgba(99,179,237,0.1); color:#63B3ED; }
+.asset-tag.acao { background:rgba(201,168,76,0.14); color:var(--gold-light); }
+.asset-tag.fii  { background:rgba(201,168,76,0.14); color:var(--gold-light); }
+.asset-desc { font-size:13.5px; line-height:1.65; color:var(--text-secondary); }
+.asset-desc strong { color:var(--text-primary); font-weight:500; }
+.asset-meta { display:flex; gap:18px; margin-top:14px; padding-top:14px; border-top:0.5px solid var(--border); flex-wrap:wrap; }
+.asset-meta-item { font-size:11px; color:var(--text-muted); }
+.asset-meta-item b { color:var(--text-secondary); font-weight:500; display:block; font-size:12px; margin-top:2px; font-family:'DM Mono', monospace; }
+
+.alert-box { border-radius:10px; padding:18px 20px; display:flex; gap:14px; margin-bottom:8px; }
+.alert-box.warning { background:rgba(201,168,76,0.07); border:0.5px solid rgba(201,168,76,0.3); }
+.alert-icon { font-size:16px; line-height:1; margin-top:1px; }
+.alert-title { font-size:13px; font-weight:500; margin:0 0 6px; color:var(--gold-light); }
+.alert-text { font-size:13.5px; line-height:1.65; margin:0; color:var(--text-secondary); }
+.alert-text b { color:var(--text-primary); }
+
+.order-list { list-style:none; }
+.action-item { display:flex; gap:14px; padding:16px 0; border-bottom:0.5px solid var(--border); }
+.action-item:last-child { border-bottom:none; }
+.action-num {
+  width:26px; height:26px; border-radius:50%;
+  background:rgba(201,168,76,0.1); border:0.5px solid rgba(201,168,76,0.3);
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px; font-weight:500; color:var(--gold); flex-shrink:0;
+}
+.action-what { font-size:13.5px; font-weight:500; color:var(--text-primary); margin:0 0 3px; }
+.action-why { font-size:12.5px; color:var(--text-muted); margin:0; line-height:1.5; }
+
+.closing {
+  background:var(--navy); padding:36px 40px;
+  text-align:center; border-top:1px solid var(--border);
+}
+.closing-quote {
+  font-family:'Playfair Display', serif; font-style:italic;
+  font-size:17px; color:var(--text-primary); line-height:1.6;
+  max-width:440px; margin:0 auto 18px;
+}
+.closing-quote span { color:var(--gold-light); }
+.closing-sig { font-size:11px; color:var(--gold); letter-spacing:0.03em; }
+
+@media (max-width:480px) {
+  .cover, .section, .closing { padding-left:22px; padding-right:22px; }
+  .metrics-grid { grid-template-columns:1fr; }
+  .asset-amount { text-align:left; }
+  .asset-head { flex-direction:column; }
+}
+</style>
+</head>
+<body>
+
+<div id="lock">
+  <div class="lock-card">
+    <div class="lock-brand"><span class="brand-dot" style="width:6px;height:6px;border-radius:50%;background:var(--gold);display:inline-block;margin-right:2px;"></span>Grão · Grupo Primo</div>
+    <p class="lock-title">Ordem de Aporte</p>
+    <p class="lock-sub">Documento confidencial de Victoria Nunes.<br>Digite a senha para acessar.</p>
+    <input type="password" id="pwd" class="lock-input" placeholder="Senha" onkeydown="if(event.key==='Enter')unlock()">
+    <button class="lock-btn" onclick="unlock()">Acessar</button>
+    <p class="lock-error" id="err">Senha incorreta. Tente novamente.</p>
+  </div>
+</div>
+
+<div class="doc" id="content">
+
+  <div class="cover">
+    <div class="brand-tag"><span class="brand-dot"></span>Grão · Grupo Primo</div>
+    <h1 class="cover-name">Ordem de Aporte</h1>
+    <div class="cover-date">Victoria Nunes · 31 de julho de 2026</div>
+    <p class="cover-quote">Cada aporte é um passo estruturado — reserva primeiro, oportunidade depois.</p>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Resumo do aporte</div>
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <p class="metric-label">Total aportado</p>
+        <p class="metric-value">R$ 3.000,00</p>
+        <p class="metric-delta">hoje</p>
+      </div>
+      <div class="metric-card">
+        <p class="metric-label">Reserva / caixa</p>
+        <p class="metric-value">R$ 2.850,00</p>
+        <p class="metric-delta">95% do aporte</p>
+      </div>
+      <div class="metric-card">
+        <p class="metric-label">Renda variável</p>
+        <p class="metric-value">R$ 150,00</p>
+        <p class="metric-delta">5% do aporte</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Detalhamento por ativo</div>
+    <p class="section-subtitle">O que é cada aplicação e por que ela está entrando na sua carteira agora.</p>
+
+    <div class="asset-card">
+      <span class="asset-tag rf">Renda fixa</span>
+      <div class="asset-head">
+        <div>
+          <p class="asset-name">Tesouro Selic 2031</p>
+          <span class="asset-ticker">LFT 2031</span>
+        </div>
+        <div class="asset-amount">R$ 2.850,00</div>
+      </div>
+      <p class="asset-desc">
+        Título público pós-fixado, com rentabilidade atrelada à taxa Selic. <strong>Liquidez diária</strong> e risco de crédito mínimo (o próprio Tesouro Nacional é o emissor). É a aplicação usada para compor sua <strong>reserva de emergência</strong> e o <strong>caixa de oportunidades</strong> — dinheiro protegido e disponível, tanto para imprevistos quanto para aproveitar boas oportunidades de compra em renda variável quando aparecerem.
+      </p>
+    </div>
+
+    <div class="asset-card">
+      <span class="asset-tag fii">Fundo imobiliário</span>
+      <div class="asset-head">
+        <div>
+          <p class="asset-name">XP Malls</p>
+          <span class="asset-ticker">XPML11</span>
+        </div>
+        <div class="asset-amount">R$ 115,00</div>
+      </div>
+      <p class="asset-desc">
+        FII de <strong>shopping centers</strong>, com participação em empreendimentos consolidados espalhados pelo Brasil. Gera <strong>renda passiva mensal isenta de Imposto de Renda</strong> para pessoa física, distribuída via dividendos. Reforça o fluxo de renda da carteira ao longo do tempo.
+      </p>
+      <div class="asset-meta">
+        <div class="asset-meta-item">Dividend Yield 12 meses<br><b>10,70%</b></div>
+        <div class="asset-meta-item">Preço máximo de compra<br><b>R$ 115,00</b></div>
+        <div class="asset-meta-item">Quantidade nesta ordem<br><b>1 cota</b></div>
+      </div>
+    </div>
+
+    <div class="asset-card">
+      <span class="asset-tag fii">Fundo imobiliário</span>
+      <div class="asset-head">
+        <div>
+          <p class="asset-name">Capitânia Securities II</p>
+          <span class="asset-ticker">CPTS11</span>
+        </div>
+        <div class="asset-amount">R$ 26,70</div>
+      </div>
+      <p class="asset-desc">
+        FII de <strong>papel</strong>, com carteira concentrada em CRIs (Certificados de Recebíveis Imobiliários). Rentabilidade indexada a CDI e IPCA+, com <strong>distribuição mensal de dividendos isenta de Imposto de Renda</strong> para pessoa física. Complementa a exposição de XPML11 com uma fonte de renda menos sensível ao valor de mercado dos imóveis.
+      </p>
+      <div class="asset-meta">
+        <div class="asset-meta-item">Dividend Yield 12 meses<br><b>13,97%</b></div>
+        <div class="asset-meta-item">Preço máximo de compra<br><b>R$ 8,90</b></div>
+        <div class="asset-meta-item">Quantidade nesta ordem<br><b>3 cotas</b></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" style="border-bottom:none;">
+    <div class="section-label">Ordem de execução</div>
+    <ul class="order-list">
+      <li class="action-item">
+        <div class="action-num">1</div>
+        <div>
+          <p class="action-what">Aplicar R$ 2.850,00 em Tesouro Selic 2031</p>
+          <p class="action-why">Reforça reserva de emergência e caixa de oportunidades — liquidez diária.</p>
+        </div>
+      </li>
+      <li class="action-item">
+        <div class="action-num">2</div>
+        <div>
+          <p class="action-what">Comprar 1 cota de XPML11, com ordem limitada em R$ 115,00</p>
+          <p class="action-why">Preço máximo de compra definido pela análise — não pagar acima disso.</p>
+        </div>
+      </li>
+      <li class="action-item">
+        <div class="action-num">3</div>
+        <div>
+          <p class="action-what">Comprar 3 cotas de CPTS11, com ordem limitada em R$ 8,90 cada</p>
+          <p class="action-why">Preço máximo de compra definido pela análise — não pagar acima disso.</p>
+        </div>
+      </li>
+      <li class="action-item">
+        <div class="action-num">4</div>
+        <div>
+          <p class="action-what">Saldo remanescente de R$ 8,30 acumulado para o próximo aporte</p>
+          <p class="action-why">Valor incorporado à próxima ordem de compra.</p>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <div class="closing">
+    <p class="closing-quote">Reserva protegida, oportunidade em construção — <span>o aporte de hoje já está no lugar certo.</span></p>
+    <p class="closing-sig">Matheus Melo · Master Planner · Grão | Grupo Primo</p>
+  </div>
+
+</div>
+
+<script>
+function unlock(){
+  var input = document.getElementById('pwd').value.trim().toLowerCase();
+  if(input === 'victoria2026'){
+    document.getElementById('lock').style.display = 'none';
+    document.getElementById('content').style.display = 'block';
+  } else {
+    document.getElementById('err').style.display = 'block';
+  }
+}
+</script>
+
+</body>
+</html>
